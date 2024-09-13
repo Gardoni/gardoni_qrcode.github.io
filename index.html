@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de QR Code</title>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #qrcode {
+            margin-top: 20px;
+        }
+
+        #download-btn {
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Gerador de QR Code</h1>
+
+        <!-- Selecionar o tipo de dado -->
+        <select id="data-type">
+            <option value="link">URL</option>
+            <option value="phone">Telefone</option>
+            <option value="email">E-mail</option>
+            <option value="whatsapp">WhatsApp</option>
+        </select>
+
+        <!-- Campo de entrada para o dado -->
+        <input type="text" id="data-input" placeholder="Digite aqui o dado para o QR Code">
+        <button onclick="generateQRCode()">Gerar QR Code</button>
+
+        <!-- QR Code gerado -->
+        <div id="qrcode"></div>
+
+        <!-- Botão de download -->
+        <a id="download-btn" download="qrcode.png">
+            <button>Baixar QR Code</button>
+        </a>
+    </div>
+
+    <script>
+        function generateQRCode() {
+            // Obtém o tipo de dado selecionado
+            var dataType = document.getElementById("data-type").value;
+
+            // Obtém o valor digitado pelo usuário
+            var inputData = document.getElementById("data-input").value;
+
+            // Verifica se o campo de entrada está vazio
+            if (inputData.trim() === "") {
+                alert("Por favor, insira um valor válido.");
+                return;
+            }
+
+            // Prepara o texto que será codificado no QR Code
+            var qrText;
+
+            // Define o formato conforme o tipo de dado selecionado
+            switch (dataType) {
+                case "link":
+                    qrText = inputData;
+                    break;
+                case "phone":
+                    qrText = `tel:${inputData}`; // Formato para telefone
+                    break;
+                case "email":
+                    qrText = `mailto:${inputData}`; // Formato para e-mail
+                    break;
+                case "whatsapp":
+                    // Formato para WhatsApp (número no formato internacional)
+                    qrText = `https://wa.me/${inputData}`;
+                    break;
+                default:
+                    qrText = inputData;
+            }
+
+            // Limpa o QR Code anterior
+            document.getElementById("qrcode").innerHTML = "";
+
+            // Cria o novo QR Code
+            var qrcode = new QRCode(document.getElementById("qrcode"), {
+                text: qrText,
+                width: 128,
+                height: 128,
+            });
+
+            // Espera o QR Code ser gerado e então exibe o botão de download
+            setTimeout(function() {
+                // Converte o QR Code para um canvas
+                var canvas = document.querySelector('#qrcode canvas');
+                var img = canvas.toDataURL("image/png");
+
+                // Cria o link de download
+                var downloadBtn = document.getElementById("download-btn");
+                downloadBtn.href = img;
+
+                // Exibe o botão de download
+                downloadBtn.style.display = "inline-block";
+            }, 500);
+        }
+    </script>
+
+</body>
+</html>
